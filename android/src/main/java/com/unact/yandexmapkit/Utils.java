@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.yandex.mapkit.LocalizedValue;
 import com.yandex.mapkit.RequestPoint;
-import com.yandex.mapkit.RequestPointType;
 import com.yandex.mapkit.ScreenPoint;
 import com.yandex.mapkit.ScreenRect;
 import com.yandex.mapkit.geometry.BoundingBox;
@@ -59,10 +58,6 @@ public class Utils {
   @SuppressWarnings({"unchecked", "ConstantConditions"})
   public static RequestPoint requestPointFromJson(Map<String, Object> json) {
     return new RequestPoint(
-      pointFromJson((Map<String, Object>) json.get("point")),
-      RequestPointType.values()[(Integer) json.get("requestPointType")],
-      null,
-      null
     );
   }
 
