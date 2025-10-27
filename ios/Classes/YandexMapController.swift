@@ -135,7 +135,6 @@ public class YandexMapController:
 
     let params = call.arguments as! [String: Any]
     userLocationLayer.setVisibleWithOn(params["visible"] as! Bool)
-    userLocationLayer.isHeadingEnabled = params["headingEnabled"] as! Bool
     userLocationLayer.isAutoZoomEnabled = params["autoZoomEnabled"] as! Bool
     userLocationLayer.resetAnchor()
 
@@ -166,7 +165,8 @@ public class YandexMapController:
       withSelectionMetaData: YMKGeoObjectSelectionMetadata(
         objectId: params["objectId"] as! String,
         dataSourceName: params["dataSourceName"] as! String,
-        layerId: params["layerId"] as! String
+        layerId: params["layerId"] as! String,
+        groupId: params["groupId"] as? NSNumber
       )
     )
   }
