@@ -38,13 +38,6 @@ class Utils {
     )
   }
 
-  static func requestPointFromJson(_ json: [String: Any]) -> YMKRequestPoint {
-    let point = pointFromJson(json["point"] as! [String: NSNumber])
-    let pointType = YMKRequestPointType(rawValue: (json["requestPointType"] as! NSNumber).uintValue)!
-
-    return YMKRequestPoint(point: point, type: pointType, pointContext: nil, drivingArrivalPointId: nil)
-  }
-
   static func geometryFromJson(_ json: [String: Any]) -> YMKGeometry {
     if let geometryPoint = json["point"] as? [String: NSNumber] {
       return YMKGeometry(point: pointFromJson(geometryPoint))

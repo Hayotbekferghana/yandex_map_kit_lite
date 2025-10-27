@@ -234,6 +234,7 @@ public class YandexMapController implements
     Map<String, Object> anchor = (Map<String, Object>) params.get("anchor");
 
     userLocationLayer.setVisible((Boolean) params.get("visible"));
+    userLocationLayer.setHeadingModeActive((Boolean) params.get("headingEnabled"));
     userLocationLayer.setAutoZoomEnabled((Boolean) params.get("autoZoomEnabled"));
     userLocationLayer.resetAnchor();
 
@@ -755,7 +756,7 @@ public class YandexMapController implements
     arguments.put("reason", cameraUpdateReason.ordinal());
     arguments.put("finished", finished);
     arguments.put("visibleRegion", Utils.visibleRegionToJson(map.getVisibleRegion()));
-    
+
     methodChannel.invokeMethod("onCameraPositionChanged", arguments);
   }
 

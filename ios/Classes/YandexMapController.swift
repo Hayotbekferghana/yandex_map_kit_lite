@@ -31,7 +31,7 @@ public class YandexMapController:
 
   public required init(id: Int64, frame: CGRect, registrar: FlutterPluginRegistrar, params: [String: Any]) {
     self.pluginRegistrar = registrar
-    self.mapView = FLYMKMapView(frame: frame, vulkanPreferred: YandexMapController.isM1Simulator())
+    self.mapView = FLYMKMapView(frame: frame, vulkanPreferred: YandexMapController.isSimulator())
     self.methodChannel = FlutterMethodChannel(
       name: "yandex_mapkit/yandex_map_\(id)",
       binaryMessenger: registrar.messenger()
@@ -135,6 +135,7 @@ public class YandexMapController:
 
     let params = call.arguments as! [String: Any]
     userLocationLayer.setVisibleWithOn(params["visible"] as! Bool)
+    userLocationLayer.isHeadingModeActive = params["headingEnabled"] as! Bool
     userLocationLayer.isAutoZoomEnabled = params["autoZoomEnabled"] as! Bool
     userLocationLayer.resetAnchor()
 
@@ -263,8 +264,12 @@ public class YandexMapController:
     return arguments
   }
 
-  private static func isM1Simulator() -> Bool {
-    return (TARGET_IPHONE_SIMULATOR & TARGET_CPU_ARM64) != 0
+  private static func isSimulator() -> Bool {
+    #if targetEnvironment(simulator)
+        return true
+    #else
+        return false
+    #endif
   }
 
   private func hasLocationPermission() -> Bool {
@@ -520,6 +525,10 @@ public class YandexMapController:
     if params.keys.contains("poiLimit") {
       map.poiLimit = params["poiLimit"] as? NSNumber
     }
+
+    if let cameraBounds = params["cameraBounds"] as? [String: Any] {
+      applyCameraBounds(cameraBounds)
+    }
   }
 
   public func applyMapObjects(_ params: [String: Any]) {
@@ -554,6 +563,16 @@ public class YandexMapController:
 
     mapView.mapWindow.focusRect = focusRect
     mapView.mapWindow.pointOfView = YMKPointOfView.adaptToFocusPointHorizontally
+  }
+
+  private func applyCameraBounds(_ params: [String: Any]) {
+    let latLngBounds = params["latLngBounds"] as? [String: Any] != nil ?
+      Utils.boundingBoxFromJson(params["latLngBounds"] as! [String: Any]) :
+      nil
+
+    mapView.mapWindow.map.cameraBounds.setMinZoomPreferenceWithZoom((params["minZoom"] as! NSNumber).floatValue)
+    mapView.mapWindow.map.cameraBounds.setMaxZoomPreferenceWithZoom((params["maxZoom"] as! NSNumber).floatValue)
+    mapView.mapWindow.map.cameraBounds.latLngBounds = latLngBounds
   }
 
   public func onObjectAdded(with view: YMKUserLocationView) {
@@ -651,7 +670,8 @@ public class YandexMapController:
         "selectionMetadata": meta == nil ? nil : [
           "dataSourceName": meta!.dataSourceName,
           "objectId": meta!.objectId,
-          "layerId": meta!.layerId
+          "layerId": meta!.layerId,
+          "groupId": meta!.groupId as Any
         ],
         "aref": geoObj.aref
       ]
